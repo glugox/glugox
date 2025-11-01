@@ -1,0 +1,17 @@
+{
+    "name": "glugox/core",
+    "description": "Core orchestration services for Glugox modules.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Glugox\\Core\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.1",
+        "illuminate/support": "^10.0",
+        "illuminate/routing": "^10.0",
+        "glugox/module": "*"
+    }
+}
