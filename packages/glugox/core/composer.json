@@ -1,0 +1,17 @@
+{
+    "name": "glugox/core",
+    "description": "Core services for the Glugox modular sandbox.",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Glugox\\Core\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Glugox\\Core\\CoreServiceProvider"
+            ]
+        }
+    }
+}
