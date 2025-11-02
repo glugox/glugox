@@ -2,7 +2,21 @@
 
 namespace Glugox\Core;
 
-class CoreServiceProvider
+use Illuminate\Support\ServiceProvider;
+
+class CoreServiceProvider extends ServiceProvider
 {
-    // Placeholder for core service provider logic
+    public function register(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Console\Commands\FreshModulesCommand::class,
+            ]);
+        }
+    }
+
+    public function boot(): void
+    {
+        // TODO: Wire ModuleLoader discovery and module service provider registration.
+    }
 }
