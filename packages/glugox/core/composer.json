@@ -1,0 +1,8 @@
+{
+    "name": "glugox/core",
+    "autoload": {
+        "psr-4": {
+            "Glugox\\Core\\": "src/"
+        }
+    }
+}

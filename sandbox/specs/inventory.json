@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "name": "Inventory"
+  },
+  "entities": [
+    {
+      "name": "Product",
+      "fields": [
+        { "name": "name", "type": "string", "rules": ["required"] }
+      ]
+    }
+  ]
+}
