@@ -1,0 +1,13 @@
+<?php
+
+namespace {{ namespace }};
+
+use Glugox\Module\BaseModuleServiceProvider;
+
+class {{ providerClass }} extends BaseModuleServiceProvider
+{
+    public function registerRoutes(): void
+    {
+        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+    }
+}

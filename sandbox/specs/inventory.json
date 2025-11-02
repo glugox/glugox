@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "name": "Inventory",
+    "slug": "inventory",
+    "version": "0.1.0",
+    "description": "Inventory demo module"
+  },
+  "entities": [
+    {
+      "name": "Product",
+      "fields": [
+        { "name": "name", "type": "string", "rules": ["required"] }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "method": "get",
+      "uri": "/api/inventory/products",
+      "action": "ProductController@index"
+    }
+  ]
+}
