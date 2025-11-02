@@ -12,7 +12,9 @@ composer create-project --prefer-dist laravel/laravel "$APP_DIR"
 
 (
   cd "$APP_DIR"
-  composer config repositories.glugox-core '{"type":"path","url":"'"$REPO_ROOT"'/packages/glugox/core","options":{"symlink":true}}'
-  composer config repositories.glugox-module '{"type":"path","url":"'"$REPO_ROOT"'/packages/glugox/module","options":{"symlink":true}}'
-  composer require glugox/core:* glugox/module:* --no-interaction
+  composer config repositories.glugox-core '{"type":"path","url":"'"$REPO_ROOT"'/packages/glugox/core","options":{"symlink":true,"canonical":false}}'
+  composer config repositories.glugox-module '{"type":"path","url":"'"$REPO_ROOT"'/packages/glugox/module","options":{"symlink":true,"canonical":false}}'
+  composer config minimum-stability dev
+  composer config prefer-stable true
+  composer require glugox/core:dev-main glugox/module:dev-main --no-interaction
 )
