@@ -1,0 +1,8 @@
+{
+    "name": "glugox/module",
+    "autoload": {
+        "psr-4": {
+            "Glugox\\Module\\": "src/"
+        }
+    }
+}
