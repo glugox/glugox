@@ -1,0 +1,7 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+{{ imports }}Route::middleware('api')
+    ->group(function (): void {
+{{ definitions }}    });
+

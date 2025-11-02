@@ -1,0 +1,23 @@
+{
+    "name": "glugox/{{ slug }}",
+    "description": {{ description }},
+    "type": "library",
+    "require": {
+        "php": "^8.1",
+        "glugox/module": "dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "{{ namespace_psr4 }}": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "{{ provider_fqn }}"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
