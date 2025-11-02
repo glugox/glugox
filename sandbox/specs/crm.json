@@ -1,13 +1,25 @@
 {
   "settings": {
-    "name": "CRM"
+    "name": "CRM",
+    "slug": "crm",
+    "version": "0.1.0",
+    "description": "Customer relationship management demo module"
   },
   "entities": [
     {
       "name": "Contact",
       "fields": [
-        { "name": "name", "type": "string", "rules": ["required"] }
+        { "name": "first_name", "type": "string", "rules": ["required"] },
+        { "name": "last_name", "type": "string", "rules": ["required"] },
+        { "name": "email", "type": "string", "rules": ["required", "email"] }
       ]
+    }
+  ],
+  "routes": [
+    {
+      "method": "get",
+      "uri": "/api/crm/contacts",
+      "action": "ContactController@index"
     }
   ]
 }
