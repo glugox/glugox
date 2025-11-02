@@ -2,22 +2,12 @@
 
 namespace Glugox\Inventory;
 
+use Glugox\Module\BaseModuleServiceProvider;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
 
-class InventoryServiceProvider extends ServiceProvider
+class InventoryServiceProvider extends BaseModuleServiceProvider
 {
-    public function register(): void
-    {
-        // No bindings required for the demo module
-    }
-
-    public function boot(): void
-    {
-        $this->registerRoutes();
-    }
-
-    protected function registerRoutes(): void
+    public function registerRoutes(): void
     {
         Route::middleware('api')
             ->prefix('api')

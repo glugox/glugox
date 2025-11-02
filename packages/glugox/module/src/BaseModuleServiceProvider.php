@@ -2,7 +2,14 @@
 
 namespace Glugox\Module;
 
-class BaseModuleServiceProvider
+use Illuminate\Support\ServiceProvider;
+
+abstract class BaseModuleServiceProvider extends ServiceProvider
 {
-    // Placeholder for base module service provider logic
+    public function boot(): void
+    {
+        $this->registerRoutes();
+    }
+
+    abstract public function registerRoutes(): void;
 }
