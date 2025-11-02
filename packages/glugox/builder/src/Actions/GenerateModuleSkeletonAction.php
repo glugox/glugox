@@ -13,9 +13,12 @@ class GenerateModuleSkeletonAction
      */
     private $logger;
 
-    public function __construct(?callable $logger = null)
+    private string $stubDirectory;
+
+    public function __construct(?callable $logger = null, ?string $stubDirectory = null)
     {
         $this->logger = $logger;
+        $this->stubDirectory = $stubDirectory ?? dirname(__DIR__, 2) . '/stubs';
     }
 
     public function __invoke(ModuleBlueprint $blueprint, string $destination): void
@@ -58,29 +61,18 @@ class GenerateModuleSkeletonAction
                 ? $blueprint->settings->name . ' module'
                 : 'Generated Glugox module');
 
-        $contents = json_encode([
-            'name' => 'glugox/' . $slug,
-            'description' => $description,
-            'type' => 'library',
-            'require' => [
-                'php' => '^8.1',
-                'glugox/module' => 'dev-main',
-            ],
-            'autoload' => [
-                'psr-4' => [
-                    $namespace . '\\' => 'src/',
-                ],
-            ],
-            'extra' => [
-                'laravel' => [
-                    'providers' => [
-                        $namespace . '\\' . $providerClass,
-                    ],
-                ],
-            ],
-            'minimum-stability' => 'dev',
-            'prefer-stable' => true,
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
+        $descriptionValue = json_encode($description, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        if ($descriptionValue === false) {
+            throw new RuntimeException('Unable to encode module description for composer.json.');
+        }
+
+        $contents = $this->renderStub('composer.json.stub', [
+            'slug' => $slug,
+            'description' => $descriptionValue,
+            'namespace' => $namespace,
+            'providerClass' => $providerClass,
+        ]);
 
         file_put_contents($path, $contents);
         $this->log('Created composer.json');
@@ -96,22 +88,10 @@ class GenerateModuleSkeletonAction
             return;
         }
 
-        $contents = <<<PHP
-<?php
-
-namespace {$namespace};
-
-use Glugox\Module\BaseModuleServiceProvider;
-
-class {$providerClass} extends BaseModuleServiceProvider
-{
-    public function registerRoutes(): void
-    {
-        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
-    }
-}
-
-PHP;
+        $contents = $this->renderStub('service-provider.stub', [
+            'namespace' => $namespace,
+            'providerClass' => $providerClass,
+        ]);
 
         file_put_contents($path, $contents);
         $this->log('Created service provider');
@@ -149,18 +129,13 @@ PHP;
             );
         }
 
-        $importsBlock = $this->implodeLines($imports);
-        $definitionsBlock = $this->implodeLines($definitions);
+        $importsBlock = $imports === [] ? '' : $this->implodeLines($imports) . PHP_EOL;
+        $definitionsBlock = $definitions === [] ? '' : $this->implodeLines($definitions);
 
-        $contents = <<<PHP
-<?php
-
-use Illuminate\Support\Facades\Route;
-{$importsBlock}Route::middleware('api')
-    ->group(function (): void {
-{$definitionsBlock}    });
-
-PHP;
+        $contents = $this->renderStub('routes.api.stub', [
+            'imports' => $importsBlock,
+            'definitions' => $definitionsBlock,
+        ]);
 
         file_put_contents($path, $contents);
         $this->log('Created routes/api.php');
@@ -185,18 +160,13 @@ PHP;
             }
 
             $methodBodies = array_map(fn (string $method): string => $this->controllerMethod($method), array_unique($methods));
-            $methodsBlock = $this->implodeLines($methodBodies);
+            $methodsBlock = $methodBodies === [] ? '' : $this->implodeLines($methodBodies);
 
-            $contents = <<<PHP
-<?php
-
-namespace {$namespace}\Http\Controllers;
-
-class {$controller}
-{
-{$methodsBlock}}
-
-PHP;
+            $contents = $this->renderStub('controller.stub', [
+                'namespace' => $namespace,
+                'class' => $controller,
+                'methods' => $methodsBlock,
+            ]);
 
             file_put_contents($path, $contents);
             $this->log("Created controller {$controller}");
@@ -235,13 +205,10 @@ PHP;
             default => "        return response()->json(['status' => 'ok']);",
         };
 
-        return <<<PHP
-    public function {$method}()
-    {
-{$body}
-    }
-
-PHP;
+        return $this->renderStub('controller-method.stub', [
+            'method' => $method,
+            'body' => $body,
+        ]);
     }
 
     private function ensureDirectory(string $path): void
@@ -273,5 +240,35 @@ PHP;
         if ($this->logger !== null) {
             ($this->logger)($message);
         }
+    }
+
+    /**
+     * @param array<string, string> $replacements
+     */
+    private function renderStub(string $stub, array $replacements): string
+    {
+        $path = $this->stubDirectory . '/' . $stub;
+
+        if (! is_file($path)) {
+            throw new RuntimeException("Stub not found: {$path}");
+        }
+
+        $contents = file_get_contents($path);
+
+        if ($contents === false) {
+            throw new RuntimeException("Unable to read stub: {$path}");
+        }
+
+        $search = [];
+        $replace = [];
+
+        foreach ($replacements as $key => $value) {
+            $search[] = '{{ ' . $key . ' }}';
+            $replace[] = $value;
+        }
+
+        $rendered = str_replace($search, $replace, $contents);
+
+        return rtrim($rendered) . PHP_EOL;
     }
 }
