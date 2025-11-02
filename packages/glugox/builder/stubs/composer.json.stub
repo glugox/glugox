@@ -8,13 +8,13 @@
     },
     "autoload": {
         "psr-4": {
-            "{{ namespace }}\\": "src/"
+            "{{ namespace_psr4 }}": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "{{ namespace }}\\{{ providerClass }}"
+                "{{ provider_fqn }}"
             ]
         }
     },

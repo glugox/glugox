@@ -50,12 +50,6 @@ class GenerateModuleSkeletonAction
     {
         $path = $destination . '/composer.json';
 
-        if (file_exists($path)) {
-            $this->log("composer.json already exists for [{$slug}], skipping.");
-
-            return;
-        }
-
         $description = $blueprint->settings->description
             ?? ($blueprint->settings->name !== ''
                 ? $blueprint->settings->name . ' module'
@@ -67,11 +61,29 @@ class GenerateModuleSkeletonAction
             throw new RuntimeException('Unable to encode module description for composer.json.');
         }
 
+        if (file_exists($path)) {
+            $existing = file_get_contents($path);
+
+            if ($existing === false) {
+                $this->log('Unable to read existing composer.json, regenerating.');
+            } else {
+                json_decode($existing, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $this->log("composer.json already exists for [{$slug}], skipping.");
+
+                    return;
+                }
+
+                $this->log('Existing composer.json contains invalid JSON, regenerating.');
+            }
+        }
+
         $contents = $this->renderStub('composer.json.stub', [
             'slug' => $slug,
             'description' => $descriptionValue,
-            'namespace' => $namespace,
-            'providerClass' => $providerClass,
+            'namespace_psr4' => str_replace('\\', '\\\\', $namespace) . '\\\\',
+            'provider_fqn' => str_replace('\\', '\\\\', $namespace . '\\' . $providerClass),
         ]);
 
         file_put_contents($path, $contents);
