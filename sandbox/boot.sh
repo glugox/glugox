@@ -12,9 +12,10 @@ composer create-project --prefer-dist laravel/laravel "$APP_DIR"
 
 (
   cd "$APP_DIR"
-  composer config repositories.glugox-core '{"type":"path","url":"'"$REPO_ROOT"'/packages/glugox/core","options":{"symlink":true,"canonical":false}}'
-  composer config repositories.glugox-module '{"type":"path","url":"'"$REPO_ROOT"'/packages/glugox/module","options":{"symlink":true,"canonical":false}}'
+  composer config repositories.glugox-core --json "{\"type\":\"path\",\"url\":\"$REPO_ROOT/packages/glugox/core\",\"options\":{\"symlink\":true,\"canonical\":false}}"
+  composer config repositories.glugox-module --json "{\"type\":\"path\",\"url\":\"$REPO_ROOT/packages/glugox/module\",\"options\":{\"symlink\":true,\"canonical\":false}}"
+  composer config repositories.glugox-inventory --json "{\"type\":\"path\",\"url\":\"$SANDBOX_DIR/modules/inventory\",\"options\":{\"symlink\":true,\"canonical\":false}}"
   composer config minimum-stability dev
   composer config prefer-stable true
-  composer require glugox/core:dev-main glugox/module:dev-main --no-interaction
+  composer require glugox/core:dev-main glugox/module:dev-main glugox/inventory:dev-main --no-interaction
 )
